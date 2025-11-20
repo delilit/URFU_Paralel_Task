@@ -61,7 +61,6 @@ fn main() -> std::io::Result<()> {
     for _step in 0..steps {
         counts += 1;
 
-        // Red cells
         vec_copy
             .par_iter_mut()
             .enumerate()
@@ -86,7 +85,6 @@ fn main() -> std::io::Result<()> {
 
         vec = vec_copy.clone();
 
-        // Black cells
         vec_copy
             .par_iter_mut()
             .enumerate()
