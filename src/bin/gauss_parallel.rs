@@ -1,3 +1,5 @@
+use std::env;
+
 use std::time::Instant;
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
@@ -22,13 +24,24 @@ pub fn compare_offense(object_vector: &Vec<Vec<f32>>, compare_vec: &Vec<Vec<f32>
 }
 
 fn main() -> std::io::Result<()> {
+
+    let args: Vec<String> = env::args().collect();
+    
+    let pool = if args.len() > 1{
+        let n: usize = args[1].parse().unwrap_or(1);
+        ThreadPoolBuilder::new().num_threads(n)
+    }
+    else{
+        ThreadPoolBuilder::new()
+    };
+
+    pool.build_global().unwrap();
+
+
     let start = Instant::now();
 
     // Threads number
-    ThreadPoolBuilder::new()
-        .num_threads(12)
-        .build_global()
-        .unwrap();
+
 
     let n = 128;
     let u = (n - 1) as f32;
