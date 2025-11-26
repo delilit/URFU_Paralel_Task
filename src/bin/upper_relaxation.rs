@@ -65,6 +65,7 @@ let mut counts = 0;
                 vec_copy[i][j] = omega/4.0*(vec_copy[i-1][j] + vec[i+1][j] + vec_copy[i][j-1] + vec[i][j+1] - h*h*f(x,y)) + (1.0-omega)*vec[i][j];
         }
         }
+        vec = vec_copy.clone();
 
         if counts % 2000 == 0{
             let difference = compare_offense(&p_vec, &vec_copy);

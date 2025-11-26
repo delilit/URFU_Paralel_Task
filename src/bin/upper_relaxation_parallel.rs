@@ -36,6 +36,8 @@ fn main() -> std::io::Result<()> {
 
     pool.build_global().unwrap();
 
+    println!("Rayon threads = {}", rayon::current_num_threads());
+
     let start = Instant::now();
     
     let omega = 1.99 as f32;

@@ -34,7 +34,7 @@ fn main() -> std::io::Result<()> {
     let start = Instant::now();
 
 
-    let n = 256;
+    let n = 512;
     let u = (n - 1) as f32;
     let h = 1.0 / u;
     let steps = 500000;
