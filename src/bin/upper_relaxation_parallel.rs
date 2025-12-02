@@ -1,4 +1,5 @@
 use std::env;
+
 use std::time::Instant;
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
@@ -22,9 +23,27 @@ pub fn compare_offense(object_vector: &Vec<Vec<f32>>, compare_vec: &Vec<Vec<f32>
     return max_value;
 }
 
+pub fn make_vec(red_vec: &Vec<Vec<f32>>, black_vec: &Vec<Vec<f32>>) -> Vec<Vec<f32>> {
+    let n = red_vec.len();
+    let mut vec = vec![vec![0.0; n]; n];
+
+    for i in 0..n {
+        for j in 0..n {
+            if (i + j) % 2 == 0 {
+                vec[i][j] = red_vec[i][j];
+            } else {
+                vec[i][j] = black_vec[i][j];
+            }
+        }
+    }
+
+    return vec;
+    
+}
+
 fn main() -> std::io::Result<()> {
 
-        let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = env::args().collect();
     
     let pool = if args.len() > 1{
         let n: usize = args[1].parse().unwrap_or(1);
@@ -36,15 +55,16 @@ fn main() -> std::io::Result<()> {
 
     pool.build_global().unwrap();
 
-    println!("Rayon threads = {}", rayon::current_num_threads());
 
     let start = Instant::now();
-    
-    let omega = 1.99 as f32;
+
+    // Threads number
+
     let n = 1024;
     let u = (n - 1) as f32;
     let h = 1.0 / u;
     let steps = 500000;
+    let omega = 1.99 as f32;
 
     let mut vec = vec![vec![0.0; n]; n];
     let mut p_vec = vec![vec![0.0; n]; n];
@@ -64,15 +84,16 @@ fn main() -> std::io::Result<()> {
             let y = j as f32 / u;
             p_vec[i][j] = (x * x - x + 1.0) * (y * y - y + 1.0);
         }
-    }
-
+    } 
+    let mut red_vec = vec.clone();
+    let mut black_vec = vec.clone();
     let mut vec_copy = vec.clone();
     let mut counts = 0;
 
     for _step in 0..steps {
         counts += 1;
 
-        vec_copy
+        red_vec
             .par_iter_mut()
             .enumerate()
             .for_each(|(i, row)| {
@@ -85,47 +106,48 @@ fn main() -> std::io::Result<()> {
                         let x = i as f32 / u;
                         let y = j as f32 / u;
                         row[j] = omega / 4.0
-                            * (vec[i - 1][j]
-                                + vec[i + 1][j]
-                                + vec[i][j - 1]
-                                + vec[i][j + 1]
+                            * (black_vec[i - 1][j]
+                                + black_vec[i + 1][j]
+                                + black_vec[i][j - 1]
+                                + black_vec[i][j + 1]
                                 - h * h * f(x, y)) + (1.0-omega)*vec[i][j];
                     }
                 }
             });
 
-        vec = vec_copy.clone();
+        //vec = vec_copy.clone();
 
-        vec_copy
+        black_vec
             .par_iter_mut()
             .enumerate()
             .for_each(|(i, row)| {
                 if i == 0 || i == n - 1 {
                     return;
                 }
-
                 for j in 1..n - 1 {
                     if (i + j) % 2 == 1 {
                         let x = i as f32 / u;
                         let y = j as f32 / u;
                         row[j] = omega / 4.0
-                            * (vec[i - 1][j]
-                                + vec[i + 1][j]
-                                + vec[i][j - 1]
-                                + vec[i][j + 1]
-                                - h * h * f(x, y)) + (1.0-omega)*vec[i][j];
+                            * (red_vec[i - 1][j]
+                                + red_vec[i + 1][j]
+                                + red_vec[i][j - 1]
+                                + red_vec[i][j + 1]
+                                - h * h * f(x, y))  + (1.0-omega)*vec[i][j];
                     }
                 }
             });
-        vec = vec_copy.clone();
+            vec = make_vec(&red_vec, &black_vec);
 
         if counts % 500 == 0 {
+            vec_copy = make_vec(&red_vec, &black_vec);
             let difference = compare_offense(&p_vec, &vec_copy);
             println!(
                 "{} iteration, max difference between real and close result is: {}",
                 counts, difference
             );
             if difference.abs() <= 0.001 {
+                println!("gol");
                 break;
             }
         }
