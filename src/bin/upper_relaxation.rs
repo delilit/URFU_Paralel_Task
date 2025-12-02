@@ -67,7 +67,7 @@ let mut counts = 0;
         }
         vec = vec_copy.clone();
 
-        if counts % 2000 == 0{
+        if counts % 500 == 0{
             let difference = compare_offense(&p_vec, &vec_copy);
             println!("{} {}", counts, difference);
             if difference.abs() <= 0.001 {

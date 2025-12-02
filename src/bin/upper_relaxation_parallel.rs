@@ -119,7 +119,7 @@ fn main() -> std::io::Result<()> {
             });
         vec = vec_copy.clone();
 
-        if counts % 2000 == 0 {
+        if counts % 500 == 0 {
             let difference = compare_offense(&p_vec, &vec_copy);
             println!(
                 "{} iteration, max difference between real and close result is: {}",
