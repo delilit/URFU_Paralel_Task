@@ -60,7 +60,7 @@ fn main() -> std::io::Result<()> {
 
     // Threads number
 
-    let n = 400;
+    let n = 512;
     let u = (n - 1) as f64;
     let h = 1.0 / u;
     let steps = 500000;

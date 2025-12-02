@@ -5,11 +5,11 @@ use rayon::ThreadPoolBuilder;
 use std::fs::File;
 use std::io::{Write, BufWriter};
 
-pub fn f(x: f32, y: f32) -> f32{
+pub fn f(x: f64, y: f64) -> f64{
     return 2.0 * (x * x - x + 1.0) + 2.0 * (y * y - y + 1.0)
 }
-pub fn compare_offense(object_vector: &Vec<Vec<f32>>, compare_vec: &Vec<Vec<f32>>) -> f32{
-    let mut max_value = 0.0 as f32;
+pub fn compare_offense(object_vector: &Vec<Vec<f64>>, compare_vec: &Vec<Vec<f64>>) -> f64{
+    let mut max_value = 0.0 as f64;
     let n = object_vector.len();
     for i in 0..n{
         for j in 0..n{
@@ -35,14 +35,14 @@ fn main() -> std::io::Result<()> {
 
 
     let n = 512;
-    let u = (n - 1) as f32;
+    let u = (n - 1) as f64;
     let h = 1.0 / u;
     let steps = 500000;
 
     let mut vec = vec![vec![0.0; n]; n];
     let mut p_vec = vec![vec![0.0; n]; n];
     for i in 0..n {
-        let x = i as f32 / u;
+        let x = i as f64 / u;
         let val = x * x - x + 1.0;
         vec[i][0] = val;
         vec[i][n - 1] = val;
@@ -53,8 +53,8 @@ fn main() -> std::io::Result<()> {
 
     for i in 0..n{
         for j in 0..n{
-            let x = i as f32/u;
-            let y = j as f32/u;
+            let x = i as f64/u;
+            let y = j as f64/u;
             p_vec[i][j] = (x * x - x + 1.0) * (y * y - y + 1.0)
         }
     }
@@ -69,8 +69,8 @@ let mut counts = 0;
                 return;
             }
             for j in 1..n-1{
-                let x = i as f32/u;
-                let y = j as f32/u;
+                let x = i as f64/u;
+                let y = j as f64/u;
                 row[j] = 0.25*(vec[i-1][j] + vec[i+1][j] + vec[i][j-1] + vec[i][j+1] - h*h*f(x,y));
             }
         });
@@ -89,8 +89,8 @@ let mut counts = 0;
 
     for i in 0..n {
         for j in 0..n {
-            let x = i as f32 / u;
-            let y = j as f32 / u;
+            let x = i as f64 / u;
+            let y = j as f64 / u;
             writeln!(writer, "{:.5}\t{:.5}\t{:.8}", x, y, vec_copy[i][j])?;
         }
     }
